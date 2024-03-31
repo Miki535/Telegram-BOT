@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/mymmrac/telego"
+	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
 )
 
@@ -21,26 +22,33 @@ func main() {
 
 	updates, _ := bot.UpdatesViaLongPolling(nil)
 
+	bh, _ := th.NewBotHandler(bot, updates)
+
+	defer bh.Stop()
 	defer bot.StopLongPolling()
 
-	for update := range updates {
-		if update.Message != nil {
-			chatID := tu.ID(update.Message.Chat.ID)
+	bh.Handle(func(bot *telego.Bot, update telego.Update) {
+		for update := range updates {
+			if update.Message != nil {
+				chatID := tu.ID(update.Message.Chat.ID)
 
-			keyboard := tu.Keyboard(
-				tu.KeyboardRow(
-					tu.KeyboardButton("btn").WithText("Hello World!"),
-					tu.KeyboardButton("Location").WithRequestLocation(),
-				),
-			)
+				keyboard := tu.Keyboard(
+					tu.KeyboardRow(
+						tu.KeyboardButton("btn").WithText("Hello World!"),
+						tu.KeyboardButton("link").WithText("LINK"),
+					),
+				)
 
-			message := tu.Message(
-				chatID,
-				"Keyboard",
-			).WithReplyMarkup(keyboard)
+				message := tu.Message(
+					chatID,
+					"Keyboard",
+				).WithReplyMarkup(keyboard)
 
-			_, _ = bot.SendMessage(message)
+				_, _ = bot.SendMessage(message)
 
+			}
 		}
-	}
+	}, th.CommandEqual("start"))
+
+	bh.Start()
 }
