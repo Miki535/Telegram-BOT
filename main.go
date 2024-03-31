@@ -32,7 +32,7 @@ func main() {
 
 		keyboard := tu.Keyboard(
 			tu.KeyboardRow(
-				tu.KeyboardButton("Our site").WithText("Come soon!"),
+				tu.KeyboardButton("Our site").WithText("https://github.com/Miki535/Telegram-BOT"),
 				tu.KeyboardButton("Documentation").WithText("To start enter any word in message and tap enter!"),
 			),
 		)
@@ -43,13 +43,13 @@ func main() {
 
 		bot.SendMessage(message)
 
-	}, th.CommandEqual("hello"))
+	}, th.CommandEqual("start"))
 
 	bh.Handle(func(bot *telego.Bot, update telego.Update) {
 		if update.Message != nil {
 			chatID := tu.ID(update.Message.Chat.ID)
 			uu := update.Message.Text
-			if uu == "To start enter any word in message and tap enter!" || uu == "Come soon!" {
+			if uu == "To start enter any word in message and tap enter!" || uu == "https://github.com/Miki535/Telegram-BOT" {
 				return
 			} else {
 
@@ -62,7 +62,7 @@ func main() {
 					fullmess,
 				)
 
-				_, _ = bot.SendMessage(message)
+				bot.SendMessage(message)
 
 			}
 		}
@@ -70,3 +70,5 @@ func main() {
 
 	bh.Start()
 }
+
+//https://telego.pixelbox.dev/docs/introduction/tutorial/
