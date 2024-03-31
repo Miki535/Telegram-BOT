@@ -28,25 +28,45 @@ func main() {
 	defer bot.StopLongPolling()
 
 	bh.Handle(func(bot *telego.Bot, update telego.Update) {
+		chatId := tu.ID(update.Message.Chat.ID)
+
+		keyboard := tu.Keyboard(
+			tu.KeyboardRow(
+				tu.KeyboardButton("Our site").WithText("Come soon!"),
+				tu.KeyboardButton("Documentation").WithText("To start enter any word in message and tap enter!"),
+			),
+		)
+		message := tu.Message(
+			chatId,
+			"Hello!",
+		).WithReplyMarkup(keyboard)
+
+		bot.SendMessage(message)
+
+	}, th.CommandEqual("hello"))
+
+	bh.Handle(func(bot *telego.Bot, update telego.Update) {
 		if update.Message != nil {
 			chatID := tu.ID(update.Message.Chat.ID)
+			uu := update.Message.Text
+			if uu == "To start enter any word in message and tap enter!" || uu == "Come soon!" {
+				return
+			} else {
 
-			keyboard := tu.Keyboard(
-				tu.KeyboardRow(
-					tu.KeyboardButton("btn").WithText("Hello World!"),
-					tu.KeyboardButton("link").WithText("LINK"),
-				),
-			)
+				messlen := len(uu)
+				mess := fmt.Sprint(messlen)
+				fullmess := fmt.Sprintf("Len of youre message..." + mess)
 
-			message := tu.Message(
-				chatID,
-				"Keyboard",
-			).WithReplyMarkup(keyboard)
+				message := tu.Message(
+					chatID,
+					fullmess,
+				)
 
-			_, _ = bot.SendMessage(message)
+				_, _ = bot.SendMessage(message)
 
+			}
 		}
-	}, th.CommandEqual("start"))
+	}, th.AnyMessageWithText())
 
 	bh.Start()
 }
